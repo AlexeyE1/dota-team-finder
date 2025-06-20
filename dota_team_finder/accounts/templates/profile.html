@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Профиль | {{ profile.steam_nickname }}{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Левая колонка -->
+    <div class="profile-sidebar">
+        <div class="profile-card">
+            <div class="card-body text-center">
+                <div class="d-flex flex-column align-items-center">
+                    <!-- Аватар пользователя -->
+                    <img src="{{ profile.steam_avatar }}" 
+                            class="rounded-circle mb-3 avatar" 
+                            width="150" 
+                            height="150"
+                            onerror="this.onerror=null;this.src='{% static 'images/default_avatar.png' %}'">
+                    
+                    <!-- Имя пользователя -->
+                    {% if edit_mode %}
+                        <form method="post" class="w-100" style="max-width:340px;">
+                            {% csrf_token %}
+                            <div class="profile-edit-section">
+                                <label class="profile-edit-label" for="id_steam_nickname">Никнейм</label>
+                                <input type="text" id="id_steam_nickname" name="steam_nickname" value="{{ form.steam_nickname.value|default:profile.steam_nickname }}" class="profile-edit-input" placeholder="Введите ваш никнейм" required>
+                            </div>
+                            <div class="profile-edit-section">
+                                <label class="profile-edit-label" for="id_role">Основная роль</label>
+                                <select id="id_role" name="role" class="role-select" required>
+                                    <option value="" disabled {% if not form.role.value and not profile.role %}selected{% endif %}>Выберите роль</option>
+                                    <option value="1" {% if form.role.value == '1' or profile.role == 1 %}selected{% endif %}>Carry</option>
+                                    <option value="2" {% if form.role.value == '2' or profile.role == 2 %}selected{% endif %}>Mid</option>
+                                    <option value="3" {% if form.role.value == '3' or profile.role == 3 %}selected{% endif %}>Offlane</option>
+                                    <option value="4" {% if form.role.value == '4' or profile.role == 4 %}selected{% endif %}>Support</option>
+                                    <option value="5" {% if form.role.value == '5' or profile.role == 5 %}selected{% endif %}>Hard Support</option>
+                                </select>
+                            </div>
+                            <div class="profile-edit-section">
+                                <label class="profile-edit-label" for="id_bio">О себе</label>
+                                <textarea id="id_bio" name="bio" class="profile-edit-textarea" placeholder="Расскажите о себе...">{{ form.bio.value|default:profile.bio }}</textarea>
+                            </div>
+                            <div class="profile-edit-section">
+                                <label class="profile-edit-label" for="id_available_from">Время доступности (с)</label>
+                                <input type="time" id="id_available_from" name="available_from" class="profile-edit-time" value="{{ form.available_from.value|default:profile.available_from|default:'' }}">
+                                <label class="profile-edit-label" for="id_available_to">Время доступности (до)</label>
+                                <input type="time" id="id_available_to" name="available_to" class="profile-edit-time" value="{{ form.available_to.value|default:profile.available_to|default:'' }}">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 mb-2">Сохранить</button>
+                            <a href="." class="btn btn-secondary w-100">Отмена</a>
+                        </form>
+                    {% else %}
+                        <h2 class="mb-3">{{ profile.steam_nickname }}</h2>
+                        <div class="roles-section mb-4">
+                            <h5>Основная роль:</h5>
+                            <div class="d-flex flex-wrap justify-content-center gap-2">
+                                {% if profile.role == 1 %}<span class="badge bg-secondary">Carry</span>{% endif %}
+                                {% if profile.role == 2 %}<span class="badge bg-secondary">Mid</span>{% endif %}
+                                {% if profile.role == 3 %}<span class="badge bg-secondary">Offlane</span>{% endif %}
+                                {% if profile.role == 4 %}<span class="badge bg-secondary">Support</span>{% endif %}
+                                {% if profile.role == 5 %}<span class="badge bg-secondary">Hard Support</span>{% endif %}
+                                {% if not profile.role %}<span class="text-muted">Не указана</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="profile-bio-section mb-4">
+                            <h5>О себе:</h5>
+                            <div class="bg-light rounded p-3 text-start" style="min-height:60px;">
+                                {{ profile.bio|default:'<span class="text-muted">Пользователь пока ничего о себе не рассказал.</span>'|safe }}
+                            </div>
+                        </div>
+                        <div class="profile-available-section mb-4">
+                            <h5>Время доступности:</h5>
+                            <div class="d-flex flex-row gap-2 justify-content-center">
+                                <span class="badge bg-info text-dark">с {{ profile.available_from|default:'--:--' }}</span>
+                                <span class="badge bg-info text-dark">до {{ profile.available_to|default:'--:--' }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Ранг пользователя -->
+                    <div class="rank-container mb-3">
+                        {% if profile.rank %}
+                        <img src="{% static 'images/dota2_medals/' %}{{ profile.rank }}.webp" 
+                                class="rank-image"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                        {% else %}
+                        <div class="text-muted">Ранг не определен</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Ссылки -->
+                <div class="d-grid gap-2">
+                    {% if profile.steam_id %}
+                    <a href="{{ profile.url }}" target="_blank" class="btn btn-secondary">
+                        <i class="fas fa-steam me-2"></i>Steam профиль
+                    </a>
+                    {% endif %}
+                    
+                    {% if user == profile and not edit_mode %}
+                    <a href="?edit=1" class="btn btn-primary mb-3">
+                        <i class="fas fa-edit me-2"></i>Редактировать профиль
+                    </a>
+                    {% endif %}
+                    
+                    {% if user != profile %}
+                    <a href="{% url 'accounts:profile_view' profile.slug %}" class="btn btn-info mb-3">
+                        <i class="fas fa-user me-2"></i>Профиль пользователя
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Правая колонка -->
+    <div class="profile-content">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4">Информация о профиле</h3>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Steam ID:</h5>
+                        <p class="text-break">{{ profile.steam_id|default:"Не привязан" }}</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Статистика:</h5>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <div class="stat-card bg-light p-2 rounded text-center">
+                                    <h6>Матчей</h6>
+                                    <p class="mb-0 fs-5">{{ profile.wins|add:profile.losses  }}</p>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-card bg-light p-2 rounded text-center">
+                                    <h6>Победы</h6>
+                                    <p class="mb-0 fs-5">{{ profile.win_rate }}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

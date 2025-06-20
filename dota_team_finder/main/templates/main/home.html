@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная | Dota Team Finder{% endblock %}
+
+{% block content %}
+    <div class="hero-section text-center py-5 bg-light rounded-3 mb-5">
+        <h1 class="display-4">Найди идеальных тиммейтов для Dota 2</h1>
+        <p class="lead">Сервис для поиска игроков по MMR, ролям и игровым предпочтениям</p>
+        
+        {% if not user.is_authenticated %}
+        <div class="mt-4">
+            <a href="{% url "social:begin" 'steam' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                <img src="{% static 'images/steam_icon.png' %}" alt="Steam" width="24" height="24" class="me-2">
+                Войти через Steam
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+
+    <!-- Блоки с описанием возможностей - теперь внизу -->
+    <section class="features py-5 bg-light rounded-3">
+        <div class="container">
+            <h2 class="text-center mb-5">Возможности сервиса</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <div class="feature-icon bg-primary bg-gradient p-3 rounded-3 mb-3 d-inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                        </svg>
+                    </div>
+                    <h3>Поиск по MMR</h3>
+                    <p class="px-3">Находите игроков с похожим уровнем мастерства для сбалансированных игр.</p>
+                </div>
+                
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <div class="feature-icon bg-primary bg-gradient p-3 rounded-3 mb-3 d-inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        </svg>
+                    </div>
+                    <h3>Фильтр по ролям</h3>
+                    <p class="px-3">Собирайте команду с идеальным распределением ролей для победы.</p>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-icon bg-primary bg-gradient p-3 rounded-3 mb-3 d-inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3>Безопасность</h3>
+                    <p class="px-3">Только реальные игроки через Steam-авторизацию без фейков и ботов.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
