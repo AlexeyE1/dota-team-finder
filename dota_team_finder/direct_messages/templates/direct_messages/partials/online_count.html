@@ -1,0 +1,7 @@
+{% if online_count > 0 %}
+<span style="display: inline-block; width: 12px; height: 12px; background:rgb(2, 255, 56); border-radius: 50%; margin-right: 6px;" hx-swap-oob="outerHTML" id="online-status-icon"></span>
+<strong class="online-status bounce-in" id="online-status" hx-swap-oob="outerHTML">online</strong>
+{% else %}
+<span id="online-status-icon" style="display: inline-block; width: 12px; height: 12px; background:rgb(90, 89, 90); border-radius: 50%; margin-right: 6px;"></span>
+<strong class="online-status" id="online-status"></strong>
+{% endif %}

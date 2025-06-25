@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Чат | Dota Team Finder{% endblock %}
+
+{% block content %}
+<div class="chat-container dark-theme h-100">
+    <div class="row h-100">
+        <!-- Список чатов (тоже будет в темной теме) -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card chat-sidebar h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Чаты</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="chat-list">
+                        <!-- Поиск чатов -->
+                        <div class="p-3 border-bottom">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Поиск чатов...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Список чатов -->
+                        <div class="chat-items">
+                            {% for chat in user_chats %}
+                            <a href="{% url 'direct_messages:chatroom' chat.group_name %}" class="chat-item d-flex align-items-center p-2" style="text-decoration:none; color:inherit; border-radius:10px; margin-bottom:2px; transition:background 0.2s; background: #232a36;">
+                                <span style="display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:8px; background: {% if chat.is_online %}#28a745{% else %}#5a595a{% endif %};"></span>
+                                <img src="{{ chat.avatar_url }}" class="rounded-circle" alt="Avatar" width="40" height="40" style="margin-right:10px;">
+                                <div class="flex-grow-1" style="min-width:0;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span style="font-weight:600; color:#fff;">{{ chat.nickname }}</span>
+                                        <span style="font-size:0.9em; color:#b0b8c1;">{{ chat.last_message_time }}</span>
+                                    </div>
+                                    <div style="font-size:0.95em; color:#b0b8c1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        {{ chat.last_message|default:"Нет сообщений" }}
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Основная область чата -->
+        <div class="col-md-8 col-lg-9">
+            <div class="card chat-main h-100">
+                <div class="card-header text-center" style="position: relative; background: #19202b; border-top-left-radius: 12px; border-top-right-radius: 12px; min-height: 64px;">
+                    <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; width: 100%; justify-content: center;">
+                        {% if other_user %}
+                            <a href="/accounts/profile/{{ other_user.slug }}/" style="display: flex; align-items: center; text-decoration: none; color: inherit; gap: 12px;">
+                                <span id="online-status-icon"></span>
+                                <img src="{{ other_user.steam_avatar|default:'https://media.steampowered.com/steamcommunity/public/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg' }}" class="rounded-circle" alt="Avatar" width="40" height="40" style="border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                    <span style="font-weight: 600; color: #fff; font-size: 1.1rem;">{{ other_user.steam_nickname }}</span>
+                                    <span style="color: #b0b8c1; font-size: 0.95rem;">@{{ other_user.slug }}</span>
+                                </div>
+                            </a>
+                        {% else %}
+                        <span id="online-status-icon"></span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="chat-messages">
+                        <div class="d-flex flex-column" id='chat_messages'>
+                        {% for message in chat_messages %}
+                        {% include "direct_messages/chat_message.html" %}
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <form method="post" class="w-100"
+                     hx-ext='ws'
+                     ws-connect='/ws/chatroom/{{ chatroom_name }}'
+                     ws-send
+                     _="on htmx:wsAfterSend reset() me"
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ form.body }}
+                            <button type="submit" class="btn btn-primary">Отправить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+
+    function scrollToBottom() {
+        const container = document.getElementById('chat_messages');
+        container.scrollTop = container.scrollHeight;
+    }
+    scrollToBottom();
+
+</script>
+{% endblock javascript %}
+
+

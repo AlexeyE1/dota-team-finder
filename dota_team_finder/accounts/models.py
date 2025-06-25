@@ -35,4 +35,4 @@ class CustomUser(AbstractUser):
     bio = models.TextField(blank=True)
     
     def __str__(self):
-        return self.username or self.steam_nickname or f"Steam user {self.steam_id}"
+        return self.steam_nickname

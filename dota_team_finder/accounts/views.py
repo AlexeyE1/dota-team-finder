@@ -1,15 +1,12 @@
-from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import TemplateView, DetailView
+from django.contrib.auth.views import LogoutView
+from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from .models import CustomUser
-from social_django.models import UserSocialAuth
-from requests import request
 from django.http import HttpResponseForbidden, HttpResponseRedirect
-from django.views.generic.edit import UpdateView
 from django import forms
-from transliterate import translit, get_available_language_codes
+
 
 class ProfileEditInlineForm(forms.ModelForm):
     class Meta:
@@ -27,10 +24,10 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
 
     def get_object(self):
-        if not self.kwargs.get('slug'):
+        if not self.kwargs.get('slug_profile'):
             user = self.request.user
             return user
-        return get_object_or_404(CustomUser, slug=self.kwargs['slug'])
+        return get_object_or_404(CustomUser, slug=self.kwargs['slug_profile'])
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()

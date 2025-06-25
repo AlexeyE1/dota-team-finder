@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('social_django.urls', namespace='social')),
     path('', include('main.urls', namespace='main')),
     path('account/', include('accounts.urls', namespace='accounts')),
+    path('chat/', include('direct_messages.urls', namespace='direct_messages')),
 ]
 
 

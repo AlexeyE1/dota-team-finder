@@ -1,0 +1,20 @@
+<div id='chat_messages' hx-swap-oob='beforeend'>
+
+<div class="fade-in-up">
+{% include "direct_messages/chat_message.html" %}
+</div>
+
+
+<style>
+    @keyframes faadeInAndUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+        animation: faadeInAndUp 0.3s ease;
+    }
+</style>
+
+<script>scrollToBottom()</script>
+
+</div>

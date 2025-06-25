@@ -1,5 +1,6 @@
 from requests import request
-from transliterate import translit
+from slugify import slugify
+
 
 
 def fill_customuser_fields(strategy, details, user=None, *args, **kwargs):
@@ -10,7 +11,7 @@ def fill_customuser_fields(strategy, details, user=None, *args, **kwargs):
     social = user.social_auth.filter(provider='steam').first()
     if social:
         data = social.extra_data.get('player', {})
-        user.slug = translit(data.get('personaname', ''), language_code='ru', reversed=True)
+        user.slug = slugify(data.get('personaname', ''))
         user.steam_id = social.uid
         user.steam_avatar = data.get('avatarfull', '')
         user.steam_nickname = data.get('personaname', '')

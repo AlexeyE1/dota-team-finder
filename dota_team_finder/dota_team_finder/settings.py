@@ -17,6 +17,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 INSTALLED_APPS = [
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,11 +76,26 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'dota_team_finder.wsgi.application'
+# WSGI_APPLICATION = 'dota_team_finder.wsgi.application'
 ASGI_APPLICATION = 'dota_team_finder.asgi.application'
 
 
-DATABASES = {
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [('redis://default:HzRCiaTsJHXMLOvIkDtMnYOiDlvtsNsV@mainline.proxy.rlwy.net:42255')],
+#         },
+#     },
+# }
+
+DATABASES = {   
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DB_NAME'),
