@@ -86,7 +86,6 @@ class ChatView(LoginRequiredMixin, TemplateView):
 
 
 
-
 @login_required
 def get_or_create_chat(request, slug_profile):
     if request.user.slug == slug_profile:
@@ -108,3 +107,37 @@ def get_or_create_chat(request, slug_profile):
         chatroom.members.add(other_user, request.user)
     
     return redirect('direct_messages:chatroom', chatroom.group_name)
+
+
+def bot_chat_view(request):
+    user = request.user
+    # Сборка списка чатов пользователя для левого меню
+    user_chats = []
+    private_chats = user.chat_groups.filter(is_private=True)
+    for group in private_chats:
+        companion = None
+        for member in group.members.all():
+            if member != user:
+                companion = member
+                break
+        if not companion:
+            continue
+        last_msg = group.chat_messages.first()
+        user_chats.append({
+            'group_name': group.group_name,
+            'avatar_url': companion.steam_avatar or 'https://media.steampowered.com/steamcommunity/public/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg',
+            'nickname': companion.steam_nickname,
+            'slug': companion.slug,
+            'last_message': last_msg.body if last_msg else '',
+            'last_message_time': last_msg.created_at.strftime('%H:%M') if last_msg else '',
+            'is_online': group.users_online.filter(pk=companion.pk).exists(),
+        })
+    context = {
+        'chatroom_name': 'bot',
+        'other_user': None,
+        'chat_messages': [],
+        'form': ChatMessageForm(),
+        'user': user,
+        'user_chats': user_chats,
+    }
+    return render(request, 'direct_messages/chat.html', context)

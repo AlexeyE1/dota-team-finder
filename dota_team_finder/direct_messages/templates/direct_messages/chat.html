@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Чат | Dota Team Finder{% endblock %}
 
+{% block title %}Чат | Dota Team Finder{% endblock %}
+z
 {% block content %}
 <div class="chat-container dark-theme h-100">
     <div class="row h-100">
@@ -24,6 +25,22 @@
                             </div>
                         </div>
                         <!-- Список чатов -->
+
+                        <!-- Чат с ботом -->
+                        <a href="{% url 'direct_messages:bot_chatroom' %}" class="chat-item d-flex align-items-center p-2" style="text-decoration:none; color:inherit; border-radius:10px; margin-bottom:2px; transition:background 0.2s; background: #232a36;">
+                            <span style="display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:8px; background: #ffc107;"></span>
+                            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" class="rounded-circle" alt="Bot" width="40" height="40" style="margin-right:10px;">
+                            <div class="flex-grow-1" style="min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-weight:600; color:#fff;">Бот-Анкета</span>
+                                    <span style="font-size:0.9em; color:#b0b8c1;">онлайн</span>
+                                </div>
+                                <div style="font-size:0.95em; color:#b0b8c1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    Заполнить анкету и найти команду
+                                </div>
+                            </div>
+                        </a>
+                        
                         <div class="chat-items">
                             {% for chat in user_chats %}
                             <a href="{% url 'direct_messages:chatroom' chat.group_name %}" class="chat-item d-flex align-items-center p-2" style="text-decoration:none; color:inherit; border-radius:10px; margin-bottom:2px; transition:background 0.2s; background: #232a36;">
@@ -40,6 +57,7 @@
                                 </div>
                             </a>
                             {% endfor %}
+
                         </div>
                     </div>
                 </div>
@@ -77,17 +95,24 @@
                 </div>
                 
                 <div class="card-footer">
-                    <form method="post" class="w-100"
-                     hx-ext='ws'
-                     ws-connect='/ws/chatroom/{{ chatroom_name }}'
-                     ws-send
-                     _="on htmx:wsAfterSend reset() me"
-                        {% csrf_token %}
-                        <div class="input-group">
-                            {{ form.body }}
-                            <button type="submit" class="btn btn-primary">Отправить</button>
+                    {% if chatroom_name == 'bot' %}
+                        <div class="input-group" id="bot-input-group" style="margin: 16px 0;">
+                            <input id="user-input" type="text" class="form-control" placeholder="Введите ответ..." style="display:none;">
+                            <button id="send-btn" class="btn btn-primary" style="display:none;">Отправить</button>
                         </div>
-                    </form>
+                    {% else %}
+                        <form method="post" class="w-100"
+                             hx-ext='ws'
+                             ws-connect='/ws/chatroom/{{ chatroom_name }}'
+                             ws-send
+                             _="on htmx:wsAfterSend reset() me"
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    {{ form.body }}
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                </div>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -97,15 +122,11 @@
 
 
 {% block javascript %}
+
 <script>
-
-    function scrollToBottom() {
-        const container = document.getElementById('chat_messages');
-        container.scrollTop = container.scrollHeight;
-    }
-    scrollToBottom();
-
+    window.chatroomName = '{{ chatroom_name }}';
 </script>
+    <script src="{% static 'js/chat_bot.js' %}"></script>
 {% endblock javascript %}
 
 
